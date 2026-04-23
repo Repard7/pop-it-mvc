@@ -1,8 +1,8 @@
 <?php
 return [
    'driver' => 'mysql',
-   'host' => 'localhost', //db
-   'database' => 'mvc', //university_db
+   'host' => 'localhost',
+   'database' => 'university_db',
    'username' => 'root', 
    'password' => '',
    'charset' => 'utf8',
