@@ -6,13 +6,15 @@ use Model\Post;
 use Model\User;
 
 use Src\View;
+use Src\Auth\Auth;
 use Src\Request;
 
 class Site
 {
    public function index(Request $request): string
    {
-       $posts = Post::where('id', $request->id)->get();
+       $id = $request->get('id');
+        $posts = Post::where('id', $id)->get();
        return (new View())->render('site.post', ['posts' => $posts]);
    }
 
@@ -29,6 +31,25 @@ class Site
         return new View('site.signup');
     }
 
+    public function login(Request $request): string
+    {
+        //Если просто обращение к странице, то отобразить форму
+        if ($request->method === 'GET') {
+            return new View('site.login');
+        }
+        //Если удалось аутентифицировать пользователя, то редирект
+        if (Auth::attempt($request->all())) {
+            app()->route->redirect('/hello');
+        }
+        //Если аутентификация не удалась, то сообщение об ошибке
+        return new View('site.login', ['message' => 'Неправильные логин или пароль']);
+    }
+
+    public function logout(): void
+    {
+        Auth::logout();
+        app()->route->redirect('/hello');
+    }
 
 
 }
