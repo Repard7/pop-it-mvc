@@ -79,4 +79,24 @@ class User extends Model implements IdentityInterface
         return $this->position && $this->position->position_name === 'Педагогический сотрудник';
     }
 
+    public function canCreateDepartment(): bool
+    {
+        return $this->isDeaneryStaff();
+    }
+
+    public function canCreateDiscipline(): bool
+    {
+        return $this->isDeaneryStaff();
+    }
+
+    public function canCreateEmployee(): bool
+    {
+        return $this->isAdmin() || $this->isDeaneryStaff();
+    }
+
+    public function canView(): bool
+    {
+        return $this->isAdmin() || $this->isDeaneryStaff() || $this->isTeachingStaff();
+    }
+
 }
