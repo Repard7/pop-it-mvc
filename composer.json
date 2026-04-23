@@ -1,0 +1,16 @@
+{
+    "name": "repard7/pop-it-mvc",
+    "description": "simple mvc app-",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ростислав Грачев",
+            "email": "gracevrostislav5@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.4 | ^8.0"
+    }
+}
