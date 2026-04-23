@@ -2,32 +2,27 @@
 <html lang="en">
 <head>
    <meta charset="UTF-8">
-   <meta name="viewport"
-         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-   <title>Pop it MVC</title>
+   <title>EduManager</title>
+   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 <header>
-   <nav>
-       <a href="<?= app()->route->getUrl('/hello') ?>">Главная</a>
-       <?php
-       if (!app()->auth::check()):
-           ?>
-           <a href="<?= app()->route->getUrl('/login') ?>">Вход</a>
-           <a href="<?= app()->route->getUrl('/signup') ?>">Регистрация</a>
-       <?php
-       else:
-           ?>
-           <a href="<?= app()->route->getUrl('/logout') ?>">Выход (<?= app()->auth::user()->name ?>)</a>
-       <?php
-       endif;
-       ?>
-   </nav>
+    <nav>
+        <?php if (app()->auth::check()): ?>
+            <a href="<?= app()->route->getUrl('/employees') ?>">Сотрудники</a>
+            <a href="<?= app()->route->getUrl('/departments') ?>">Кафедры</a>
+            <a href="<?= app()->route->getUrl('/disciplines') ?>">Дисциплины</a>
+            <?php if (app()->auth::user()->isAdmin()): ?>
+                <a href="<?= app()->route->getUrl('/employees/add') ?>">Добавить сотрудника</a>
+            <?php endif; ?>
+            <a href="<?= app()->route->getUrl('/logout') ?>">Выход (<?= app()->auth::user()->login ?>)</a>
+        <?php endif; ?>
+    </nav>
 </header>
 <main>
    <?= $content ?? '' ?>
 </main>
-
 </body>
 </html>

@@ -1,7 +1,9 @@
 <h2>Авторизация</h2>
-<h3><?= $message ?? ''; ?></h3>
 
-<h3><?= app()->auth->user()->name ?? ''; ?></h3>
+<?php if (!empty($message)): ?>
+    <h3 style="color: red;"><?= $message ?></h3>
+<?php endif; ?>
+
 <?php
 if (!app()->auth::check()):
    ?>

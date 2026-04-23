@@ -11,17 +11,18 @@ use Src\Request;
 
 class Site
 {
-   public function index(Request $request): string
-   {
-       $id = $request->get('id');
+    /*
+    public function index(Request $request): string
+    {
+        $id = $request->get('id');
         $posts = Post::where('id', $id)->get();
-       return (new View())->render('site.post', ['posts' => $posts]);
-   }
-
-   public function hello(): string
-   {
-       return new View('site.hello', ['message' => 'hello working']);
-   }
+        return (new View())->render('site.post', ['posts' => $posts]);
+    }
+   
+    public function hello(): string
+    {
+        return new View('site.hello', ['message' => 'hello working']);
+    }
 
     public function signup(Request $request): string
     {
@@ -30,6 +31,7 @@ class Site
         }
         return new View('site.signup');
     }
+    */
 
     public function login(Request $request): string
     {
@@ -39,7 +41,7 @@ class Site
         }
         //Если удалось аутентифицировать пользователя, то редирект
         if (Auth::attempt($request->all())) {
-            app()->route->redirect('/hello');
+            app()->route->redirect('/');
         }
         //Если аутентификация не удалась, то сообщение об ошибке
         return new View('site.login', ['message' => 'Неправильные логин или пароль']);
@@ -48,7 +50,12 @@ class Site
     public function logout(): void
     {
         Auth::logout();
-        app()->route->redirect('/hello');
+        app()->route->redirect('/login');
+    }
+
+    public function index(): string
+    {
+        return new View('site.index');
     }
 
 
