@@ -1,4 +1,4 @@
-<h2>➕ Добавление дисциплины</h2>
+<h2>Добавление дисциплины</h2>
 
 <form method="post">
     <label style="display: block; margin-bottom: 10px;">

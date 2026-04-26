@@ -1,16 +1,32 @@
-<h2>✏️ Редактирование дисциплины</h2>
+<h2>Редактирование дисциплины</h2>
 
 <form method="post" action="<?= app()->route->getUrl('/disciplines/edit?id=' . $discipline->discipline_id) ?>">
-    <label style="display: block; margin-bottom: 15px;">
-        Название дисциплины<br>
-        <input type="text" name="name" value="<?= htmlspecialchars($discipline->discipline_name) ?>" required style="width: 100%;">
-    </label>
+    <div class="form-group">
+        <label>Название дисциплины</label>
+        <input type="text" name="name" value="<?= htmlspecialchars($discipline->discipline_name) ?>" required>
+    </div>
 
-    <fieldset style="margin-bottom: 20px;">
-        <legend>Кафедры:</legend>
+    <div class="form-group">
+        <label>Количество часов</label>
+        <input type="number" name="hours" value="<?= $discipline->hours ?>" required>
+    </div>
+
+    <div class="form-group">
+        <label>Семестр</label>
+        <select name="semester" required>
+            <?php for ($i = 1; $i <= 8; $i++): ?>
+                <option value="<?= $i ?>" <?= $discipline->semester == $i ? 'selected' : '' ?>>
+                    <?= $i ?> семестр
+                </option>
+            <?php endfor; ?>
+        </select>
+    </div>
+
+    <fieldset>
+        <legend>Кафедры</legend>
+        <input type="hidden" name="department_ids" value="">
         <?php 
         $attachedIds = $discipline->departments->pluck('department_id')->toArray();
-        
         foreach ($departments as $dep): 
         ?>
             <label style="display: block; margin: 8px 0;">
@@ -23,6 +39,8 @@
         <?php endforeach; ?>
     </fieldset>
 
-    <button type="submit">Сохранить</button>
-    <a href="<?= app()->route->getUrl('/disciplines') ?>">Отмена</a>
+    <div class="form-actions">
+        <button type="submit" class="btn-primary">Сохранить изменения</button>
+        <a href="<?= app()->route->getUrl('/disciplines') ?>" class="btn-secondary">Отмена</a>
+    </div>
 </form>

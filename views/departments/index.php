@@ -1,22 +1,44 @@
-<h2>Список кафедр</h2>
+<h2>Кафедры</h2>
 
-<?php if (app()->auth::user()->canCreateDepartment()): ?>
-    <a href="<?= app()->route->getUrl('/departments/add') ?>">Добавить кафедру</a>
-<?php endif; ?>
+<div style="margin-bottom: 24px;">
+    <?php if (app()->auth::user()->canCreateDepartment()): ?>
+        <a href="<?= app()->route->getUrl('/departments/add') ?>" class="btn">Добавить кафедру</a>
+    <?php endif; ?>
+</div>
 
 <?php if ($departments->count() > 0): ?>
-    <ul>
+    <div class="cards-grid">
         <?php foreach ($departments as $dep): ?>
-            <li>
-                <?= $dep->department_name ?>
-                (<?= $dep->disciplines->count() ?> дисциплин)
+            <div class="department-card">
+                <div class="card-header">
+                    <h3><?= htmlspecialchars($dep->department_name) ?></h3>
+                    <span class="card-code"><?= htmlspecialchars($dep->code) ?></span>
+                </div>
+                <div class="card-body">
+                    <p>Дисциплин: <strong><?= $dep->disciplines->count() ?></strong></p>
+                    <?php if ($dep->disciplines->count() > 0): ?>
+                        <details>
+                            <summary>Список дисциплин</summary>
+                            <ul class="discipline-list">
+                                <?php foreach ($dep->disciplines as $disc): ?>
+                                    <li><?= htmlspecialchars($disc->discipline_name) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </details>
+                    <?php endif; ?>
+                </div>
                 <?php if (app()->auth::user()->isDeaneryStaff()): ?>
-                    <a href="<?= app()->route->getUrl('/departments/edit?id=' . $dep->department_id) ?>">✏️</a>
-                    <a href="<?= app()->route->getUrl('/departments/delete?id=' . $dep->department_id) ?>" onclick="return confirm('Удалить?')">❌</a>
+                    <div class="card-actions">
+                        <a href="<?= app()->route->getUrl('/departments/edit?id=' . $dep->department_id) ?>" class="action-link">Редактировать</a>
+                        <a href="<?= app()->route->getUrl('/departments/delete?id=' . $dep->department_id) ?>" class="action-link delete-link" onclick="return confirm('Удалить кафедру?')">Удалить</a>
+                    </div>
                 <?php endif; ?>
-            </li>
+            </div>
         <?php endforeach; ?>
-    </ul>
+    </div>
 <?php else: ?>
-    <p>Нет данных</p>
+    <div class="empty-state">
+        <p>Нет данных о кафедрах</p>
+        <a href="<?= app()->route->getUrl('/departments/add') ?>" class="btn">Добавить первую кафедру</a>
+    </div>
 <?php endif; ?>
