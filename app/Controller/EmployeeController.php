@@ -8,51 +8,68 @@ use Model\Position;
 use Model\Department;
 use Src\View;
 use Src\Request;
+use Src\Validator\Validator;
 
 class EmployeeController
 {
     public function index(): string
     {
         $employees = Employee::with('users.position', 'users.department')->get();
-        $view = new View('employees.index', ['employees' => $employees]);
-        return $view->render();
+        return (new View('employees.index', ['employees' => $employees]))->render();
     }
 
     public function add(Request $request): string
     {
+        $departments = Department::all();
+        
+        if ($request->method === 'GET') {
+            return (new View('employees.add', ['departments' => $departments]))->render();
+        }
+        
         $currentUser = app()->auth::user();
         
-        // Если GET — показываем форму с данными для select'ов
-        if ($request->method === 'GET') {
-            $departments = Department::all();
-            $positions = Position::all();
+        // Валидация
+        $validator = new Validator($request->all(), [
+            'lastname' => ['required'],
+            'firstname' => ['required'],
+            'gender' => ['required'],
+            'birthdate' => ['required'],
+            'address' => ['required'],
+            'login' => ['required', 'unique:User,login'],
+            'password' => ['required']
+        ], [
+            'required' => 'Поле :field обязательно для заполнения',
+            'unique' => 'Поле :field должно быть уникальным'
+        ]);
+        
+        if ($validator->fails()) {
             return (new View('employees.add', [
                 'departments' => $departments,
-                'positions' => $positions
+                'errors' => $validator->errors(),
+                'old' => $request->all()
             ]))->render();
         }
         
-        // Если POST — сохраняем
-        
-        // 1. Создаем запись о сотруднике
         $employee = Employee::create([
             'first_name' => $request->firstname,
             'last_name' => $request->lastname,
             'patronymic' => $request->middlename,
-            'gender' => $request->gender, // Теперь приходит 'М' или 'Ж'
+            'gender' => $request->gender,
             'birth_date' => $request->birthdate,
             'registration_address' => $request->address
         ]);
         
-        // 2. Хешируем пароль
-        $hashedPassword = password_hash($request->password, PASSWORD_DEFAULT);
+        if ($currentUser->isAdmin()) {
+            $position = Position::where('position_name', 'Сотрудник деканата')->first();
+        } else {
+            $position = Position::where('position_name', 'Педагогический сотрудник')->first();
+        }
         
-        // 3. Создаем запись пользователя
         User::create([
             'login' => $request->login,
-            'password' => $hashedPassword,
+            'password' => password_hash($request->password, PASSWORD_DEFAULT),
             'employee_id' => $employee->employee_id,
-            'position_id' => $request->position_id, // Берем из формы
+            'position_id' => $position->position_id,
             'department_id' => $request->department_id ?: null
         ]);
         
@@ -60,22 +77,10 @@ class EmployeeController
         return '';
     }
 
-    public function delete(Request $request): void
-    {
-        $employee = Employee::find($request->id);
-         if ($employee) {
-            $user = $employee->users->first();
-            if ($user) {
-                $user->delete();
-            }
-            $employee->delete();
-        }
-        app()->route->redirect('/employees');
-    }
-
     public function edit(Request $request): string
     {
         $employee = Employee::with('users.position', 'users.department')->find($request->id);
+        $departments = Department::all();
         
         if (!$employee) {
             app()->route->redirect('/employees');
@@ -84,9 +89,7 @@ class EmployeeController
         
         $user = $employee->users->first();
         
-        // GET: показываем форму
         if ($request->method === 'GET') {
-            $departments = Department::all();
             return (new View('employees.edit', [
                 'employee' => $employee,
                 'user' => $user,
@@ -94,30 +97,79 @@ class EmployeeController
             ]))->render();
         }
         
-        // POST: обновляем данные сотрудника
+        // Валидация для редактирования (логин уникальный, но исключая текущего)
+        $validator = new Validator($request->all(), [
+            'lastname' => ['required', 'name_part'],
+            'firstname' => ['required', 'name_part'],
+            'middlename' => ['name_part'],
+            'gender' => ['required'],
+            'birthdate' => ['required'],
+            'address' => ['required'],
+            'login' => ['required', 'unique:User,login'] // unique проверку делаем отдельно
+        ], [
+            'required' => 'Поле :field обязательно для заполнения',
+            'name_part' => 'Поле :field должно содержать только буквы',
+            'unique' => 'Поле :field должно быть уникальным'
+        ]);
+        
+        // Проверка уникальности логина (исключая текущего пользователя)
+        $existingUser = User::where('login', $request->login)
+            ->where('user_id', '!=', $user->user_id)
+            ->first();
+        
+        if ($existingUser) {
+            return (new View('employees.edit', [
+                'employee' => $employee,
+                'user' => $user,
+                'departments' => $departments,
+                'errors' => ['login' => ['Поле login должно быть уникальным']],
+                'old' => $request->all()
+            ]))->render();
+        }
+        
+        if ($validator->fails()) {
+            return (new View('employees.edit', [
+                'employee' => $employee,
+                'user' => $user,
+                'departments' => $departments,
+                'errors' => $validator->errors(),
+                'old' => $request->all()
+            ]))->render();
+        }
+        
         $employee->update([
             'first_name' => $request->firstname,
             'last_name' => $request->lastname,
             'patronymic' => $request->middlename,
-            'gender' => $request->gender === 'male' ? 'М' : 'Ж',
+            'gender' => $request->gender,
             'birth_date' => $request->birthdate,
             'registration_address' => $request->address
         ]);
-
-        // Обновляем данные пользователя
+        
         if ($user) {
             $user->update([
                 'login' => $request->login,
                 'department_id' => $request->department_id ?: null
             ]);
-
-            // Обновляем пароль только если он был указан
+            
             if (!empty($request->password)) {
-                $user->update(['password' => md5($request->password)]);
+                $user->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
             }
         }
         
         app()->route->redirect('/employees');
         return '';
+    }
+
+    public function delete(Request $request): void
+    {
+        $employee = Employee::find($request->id);
+        if ($employee) {
+            if ($user = $employee->users->first()) {
+                $user->delete();
+            }
+            $employee->delete();
+        }
+        app()->route->redirect('/employees');
     }
 }

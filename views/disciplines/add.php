@@ -1,45 +1,56 @@
 <h2>Добавление дисциплины</h2>
 
+<?php if (!empty($errors)): ?>
+    <div style="background: rgba(234, 67, 53, 0.1); color: #EA4335; padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 3px solid #EA4335;">
+        <?php foreach ($errors as $field => $fieldErrors): ?>
+            <?php foreach ($fieldErrors as $error): ?>
+                <p style="margin: 5px 0;"><?= htmlspecialchars($error) ?></p>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
 <form method="post">
-    <label style="display: block; margin-bottom: 10px;">
-        Название дисциплины<br>
-        <input type="text" name="name" required style="width: 100%;">
-    </label>
+    <div class="form-group">
+        <label>Название дисциплины</label>
+        <input type="text" name="name" value="<?= htmlspecialchars($old['name'] ?? '') ?>">
+    </div>
 
-    <label style="display: block; margin-bottom: 10px;">
-        Количество часов<br>
-        <input type="number" name="hours" required style="width: 100%;">
-    </label>
+    <div class="form-group">
+        <label>Количество часов</label>
+        <input type="number" name="hours" value="<?= htmlspecialchars($old['hours'] ?? '') ?>">
+    </div>
 
-    <label style="display: block; margin-bottom: 15px;">
-        Семестр<br>
-        <select name="semester" required style="width: 100%;">
-            <option value="1">1 семестр</option>
-            <option value="2">2 семестр</option>
-            <option value="3">3 семестр</option>
-            <option value="4">4 семестр</option>
-            <option value="5">5 семестр</option>
-            <option value="6">6 семестр</option>
-            <option value="7">7 семестр</option>
-            <option value="8">8 семестр</option>
+    <div class="form-group">
+        <label>Семестр</label>
+        <select name="semester" required>
+            <option value="1" <?= ($old['semester'] ?? '') == 1 ? 'selected' : '' ?>>1 семестр</option>
+            <option value="2" <?= ($old['semester'] ?? '') == 2 ? 'selected' : '' ?>>2 семестр</option>
+            <option value="3" <?= ($old['semester'] ?? '') == 3 ? 'selected' : '' ?>>3 семестр</option>
+            <option value="4" <?= ($old['semester'] ?? '') == 4 ? 'selected' : '' ?>>4 семестр</option>
+            <option value="5" <?= ($old['semester'] ?? '') == 5 ? 'selected' : '' ?>>5 семестр</option>
+            <option value="6" <?= ($old['semester'] ?? '') == 6 ? 'selected' : '' ?>>6 семестр</option>
+            <option value="7" <?= ($old['semester'] ?? '') == 7 ? 'selected' : '' ?>>7 семестр</option>
+            <option value="8" <?= ($old['semester'] ?? '') == 8 ? 'selected' : '' ?>>8 семестр</option>
         </select>
-    </label>
+    </div>
 
-    <fieldset style="margin-bottom: 20px;">
-        <legend>Кафедры:</legend>
-        
+    <fieldset>
+        <legend>Кафедры</legend>
         <input type="hidden" name="department_ids" value="">
-        
         <?php foreach ($departments as $dep): ?>
             <label style="display: block; margin: 5px 0;">
                 <input type="checkbox" 
                        name="department_ids[]" 
-                       value="<?= $dep->department_id ?>">
+                       value="<?= $dep->department_id ?>"
+                       <?= (in_array($dep->department_id, (array)($old['department_ids'] ?? []))) ? 'checked' : '' ?>>
                 <?= htmlspecialchars($dep->department_name) ?>
             </label>
         <?php endforeach; ?>
     </fieldset>
 
-    <button type="submit">Добавить</button>
-    <a href="<?= app()->route->getUrl('/disciplines') ?>">Отмена</a>
+    <div class="form-actions">
+        <button type="submit" class="btn-primary">Добавить</button>
+        <a href="<?= app()->route->getUrl('/disciplines') ?>" class="btn-secondary">Отмена</a>
+    </div>
 </form>

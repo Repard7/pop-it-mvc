@@ -1,43 +1,53 @@
 <h2>Редактирование сотрудника</h2>
 
+<?php if (!empty($errors)): ?>
+    <div style="background: rgba(234, 67, 53, 0.1); color: #EA4335; padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 3px solid #EA4335;">
+        <?php foreach ($errors as $field => $fieldErrors): ?>
+            <?php foreach ($fieldErrors as $error): ?>
+                <p style="margin: 5px 0;"><?= htmlspecialchars($error) ?></p>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
 <form method="post" action="<?= app()->route->getUrl('/employees/edit?id=' . $employee->employee_id) ?>">
     <div class="form-grid">
         <div class="form-group">
             <label>Фамилия</label>
-            <input type="text" name="lastname" value="<?= htmlspecialchars($employee->last_name) ?>" required>
+            <input type="text" name="lastname" value="<?= htmlspecialchars($old['lastname'] ?? $employee->last_name) ?>">
         </div>
         
         <div class="form-group">
             <label>Имя</label>
-            <input type="text" name="firstname" value="<?= htmlspecialchars($employee->first_name) ?>" required>
+            <input type="text" name="firstname" value="<?= htmlspecialchars($old['firstname'] ?? $employee->first_name) ?>">
         </div>
         
         <div class="form-group">
             <label>Отчество</label>
-            <input type="text" name="middlename" value="<?= htmlspecialchars($employee->patronymic) ?>">
+            <input type="text" name="middlename" value="<?= htmlspecialchars($old['middlename'] ?? $employee->patronymic) ?>">
         </div>
 
         <div class="form-group">
             <label>Пол</label>
-            <select name="gender" required>
-                <option value="М" <?= $employee->gender === 'М' ? 'selected' : '' ?>>Мужской</option>
-                <option value="Ж" <?= $employee->gender === 'Ж' ? 'selected' : '' ?>>Женский</option>
+            <select name="gender">
+                <option value="М" <?= ($old['gender'] ?? $employee->gender) == 'М' ? 'selected' : '' ?>>Мужской</option>
+                <option value="Ж" <?= ($old['gender'] ?? $employee->gender) == 'Ж' ? 'selected' : '' ?>>Женский</option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Дата рождения</label>
-            <input type="date" name="birthdate" value="<?= htmlspecialchars($employee->birth_date) ?>" required>
+            <input type="date" name="birthdate" value="<?= htmlspecialchars($old['birthdate'] ?? $employee->birth_date) ?>">
         </div>
         
         <div class="form-group">
             <label>Адрес</label>
-            <input type="text" name="address" value="<?= htmlspecialchars($employee->registration_address) ?>" required>
+            <input type="text" name="address" value="<?= htmlspecialchars($old['address'] ?? $employee->registration_address) ?>">
         </div>
 
         <div class="form-group">
             <label>Логин</label>
-            <input type="text" name="login" value="<?= htmlspecialchars($user->login ?? '') ?>" required>
+            <input type="text" name="login" value="<?= htmlspecialchars($old['login'] ?? $user->login ?? '') ?>">
         </div>
         
         <div class="form-group">
@@ -50,7 +60,7 @@
             <select name="department_id">
                 <option value="">— Без кафедры —</option>
                 <?php foreach ($departments as $dep): ?>
-                    <option value="<?= $dep->department_id ?>" <?= ($user->department_id ?? '') == $dep->department_id ? 'selected' : '' ?>>
+                    <option value="<?= $dep->department_id ?>" <?= ($old['department_id'] ?? $user->department_id ?? '') == $dep->department_id ? 'selected' : '' ?>>
                         <?= htmlspecialchars($dep->department_name) ?>
                     </option>
                 <?php endforeach; ?>

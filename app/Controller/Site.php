@@ -8,6 +8,7 @@ use Model\User;
 use Src\View;
 use Src\Auth\Auth;
 use Src\Request;
+use Src\Validator\Validator;
 
 class Site
 {
@@ -35,15 +36,39 @@ class Site
 
     public function login(Request $request): string
     {
-        //Если просто обращение к странице, то отобразить форму
+        // Если просто обращение к странице, то отобразить форму
         if ($request->method === 'GET') {
             return new View('site.login');
         }
-        //Если удалось аутентифицировать пользователя, то редирект
+        
+        // Валидация полей входа
+        $validator = new Validator($request->all(), [
+            'login' => ['required'],
+            'password' => ['required']
+        ], [
+            'required' => 'Поле :field обязательно для заполнения'
+        ]);
+        
+        // Если валидация не прошла
+        if ($validator->fails()) {
+            // Преобразуем ошибки в читаемый формат
+            $errorMessages = [];
+            foreach ($validator->errors() as $field => $messages) {
+                $fieldName = ($field === 'login') ? 'Логин' : 'Пароль';
+                $errorMessages[] = $fieldName . ': ' . implode(', ', $messages);
+            }
+            
+            return new View('site.login', [
+                'message' => implode('<br>', $errorMessages)
+            ]);
+        }
+        
+        // Если удалось аутентифицировать пользователя, то редирект
         if (Auth::attempt($request->all())) {
             app()->route->redirect('/');
         }
-        //Если аутентификация не удалась, то сообщение об ошибке
+        
+        // Если аутентификация не удалась, то сообщение об ошибке
         return new View('site.login', ['message' => 'Неправильные логин или пароль']);
     }
 
