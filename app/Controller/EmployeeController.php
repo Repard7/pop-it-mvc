@@ -8,7 +8,11 @@ use Model\Position;
 use Model\Department;
 use Src\View;
 use Src\Request;
-use Src\Validator\Validator;
+
+use Validation\Validator;
+use Validation\Validators\RequireValidator;
+use Validation\Validators\UniqueValidator;
+use Validation\Validators\NamePartValidator;
 
 class EmployeeController
 {
@@ -42,6 +46,10 @@ class EmployeeController
             'required' => 'Поле :field обязательно для заполнения',
             'name_part' => 'Поле :field должно содержать только буквы',
             'unique' => 'Поле :field должно быть уникальным'
+        ], [
+            'required' => RequireValidator::class,
+            'unique' => UniqueValidator::class,
+            'name_part' => NamePartValidator::class
         ]);
         
         if ($validator->fails()) {
@@ -99,7 +107,6 @@ class EmployeeController
             ]))->render();
         }
         
-        // Валидация для редактирования
         $validator = new Validator($request->all(), [
             'lastname' => ['required', 'name_part'],
             'firstname' => ['required', 'name_part'],
@@ -111,9 +118,11 @@ class EmployeeController
         ], [
             'required' => 'Поле :field обязательно для заполнения',
             'name_part' => 'Поле :field должно содержать только буквы'
+        ], [
+            'required' => RequireValidator::class,
+            'name_part' => NamePartValidator::class
         ]);
-        
-        // Проверка уникальности логина (исключая текущего пользователя)
+
         $existingUser = User::where('login', $request->login)
             ->where('user_id', '!=', $user->user_id)
             ->first();

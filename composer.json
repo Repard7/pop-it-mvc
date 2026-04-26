@@ -10,11 +10,23 @@
         }
     ],
     "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/collect"
+        },
+        {
+            "type": "path",
+            "url": "packages/validation"
+        }
+    ],
     "require": {
         "php": "^7.4 | ^8.0",
         "illuminate/database": "^12.0@dev",
         "illuminate/events": "^12.0@dev",
-        "nikic/fast-route": "^2.0@dev"
+        "nikic/fast-route": "^2.0@dev",
+        "repard7/collect": "@dev",
+        "repard7/validation": "@dev"
     },
     "autoload": {
         "psr-4": {

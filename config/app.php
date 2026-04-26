@@ -13,9 +13,4 @@ return [
         'specialChars' => \Middlewares\SpecialCharsMiddleware::class,
         'csrf' => \Middlewares\CSRFMiddleware::class,
    ],
-    'validators' => [
-        'required' => \Validators\RequireValidator::class,
-        'unique' => \Validators\UniqueValidator::class,
-        'name_part' => \Validators\NamePartValidator::class,
-   ]
 ];

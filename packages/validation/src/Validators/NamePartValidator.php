@@ -1,8 +1,8 @@
 <?php
 
-namespace Validators;
+namespace Validation\Validators;
 
-use Src\Validator\AbstractValidator;
+use Validation\AbstractValidator;
 
 class NamePartValidator extends AbstractValidator
 {

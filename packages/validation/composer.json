@@ -1,0 +1,21 @@
+{
+    "name": "repard7/validation",
+    "description": "Validation library for PHP",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ростислав Грачев",
+            "email": "gracevrostislav5@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "illuminate/database": "^12.0@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Validation\\": "src/"
+        }
+    }
+}

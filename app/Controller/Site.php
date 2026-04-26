@@ -8,7 +8,9 @@ use Model\User;
 use Src\View;
 use Src\Auth\Auth;
 use Src\Request;
-use Src\Validator\Validator;
+
+use Validation\Validator;
+use Validation\Validators\RequireValidator;
 
 class Site
 {
@@ -47,6 +49,8 @@ class Site
             'password' => ['required']
         ], [
             'required' => 'Поле :field обязательно для заполнения'
+        ], [
+            'required' => RequireValidator::class
         ]);
         
         // Если валидация не прошла

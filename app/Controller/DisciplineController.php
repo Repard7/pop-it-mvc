@@ -6,7 +6,9 @@ use Model\Discipline;
 use Model\Department;
 use Src\View;
 use Src\Request;
-use Src\Validator\Validator;
+
+use Validation\Validator;
+use Validation\Validators\RequireValidator;
 
 class DisciplineController
 {
@@ -30,6 +32,8 @@ class DisciplineController
             'semester' => ['required']
         ], [
             'required' => 'Поле :field обязательно для заполнения'
+        ], [
+            'required' => RequireValidator::class
         ]);
         
         if ($validator->fails()) {
@@ -77,13 +81,16 @@ class DisciplineController
             'semester' => ['required']
         ], [
             'required' => 'Поле :field обязательно для заполнения'
+        ], [
+            'required' => RequireValidator::class  // ← ЭТОЙ СТРОКИ НЕ ХВАТАЛО
         ]);
         
         if ($validator->fails()) {
             return (new View('disciplines.edit', [
                 'discipline' => $discipline,
                 'departments' => $departments,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
+                'old' => $request->all()
             ]))->render();
         }
         

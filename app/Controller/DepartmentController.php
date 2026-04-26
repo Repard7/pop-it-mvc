@@ -5,7 +5,11 @@ namespace Controller;
 use Model\Department;
 use Src\View;
 use Src\Request;
-use Src\Validator\Validator;
+
+use Validation\Validator;
+use Validation\Validators\RequireValidator;
+use Validation\Validators\UniqueValidator;
+
 
 class DepartmentController
 {
@@ -27,6 +31,9 @@ class DepartmentController
         ], [
             'required' => 'Поле :field обязательно для заполнения',
             'unique' => 'Кафедра с таким кодом уже существует'
+        ], [
+            'required' => RequireValidator::class,
+            'unique' => UniqueValidator::class
         ]);
         
         if ($validator->fails()) {
@@ -63,6 +70,8 @@ class DepartmentController
             'code' => ['required']
         ], [
             'required' => 'Поле :field обязательно для заполнения'
+        ], [
+            'required' => RequireValidator::class  // ← ЭТОЙ СТРОКИ НЕ ХВАТАЛО
         ]);
         
         // Проверка уникальности кода (исключая текущую кафедру)
@@ -73,14 +82,16 @@ class DepartmentController
         if ($existingDept) {
             return (new View('departments.edit', [
                 'department' => $department,
-                'errors' => ['code' => ['Кафедра с таким кодом уже существует']]
+                'errors' => ['code' => ['Кафедра с таким кодом уже существует']],
+                'old' => $request->all()
             ]))->render();
         }
         
         if ($validator->fails()) {
             return (new View('departments.edit', [
                 'department' => $department,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
+                'old' => $request->all()
             ]))->render();
         }
         
