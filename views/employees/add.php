@@ -17,6 +17,7 @@ $isDeaneryStaff = $currentUser->isDeaneryStaff();
 <?php endif; ?>
 
 <form method="post">
+    <input type="hidden" name="csrf_token" value="<?= app()->auth::generateCSRF() ?>">
     <div class="form-grid">
         <div class="form-group">
             <label>Фамилия</label>

@@ -13,6 +13,7 @@
 
         <?php if (!app()->auth::check()): ?>
             <form method="post" class="login-form" novalidate>
+                <input type="hidden" name="csrf_token" value="<?= app()->auth::generateCSRF() ?>">
                 <div class="form-group">
                     <label>Логин</label>
                     <input type="text" name="login" placeholder="Введите ваш логин" value="<?= htmlspecialchars($old['login'] ?? '') ?>" required autofocus>

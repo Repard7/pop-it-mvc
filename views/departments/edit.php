@@ -11,6 +11,7 @@
 <?php endif; ?>
 
 <form method="post" action="<?= app()->route->getUrl('/departments/edit?id=' . $department->department_id) ?>">
+    <input type="hidden" name="csrf_token" value="<?= app()->auth::generateCSRF() ?>">
     <div class="form-group">
         <label>Название кафедры</label>
         <input type="text" name="name" value="<?= htmlspecialchars($old['name'] ?? $department->department_name) ?>">

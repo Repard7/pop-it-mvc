@@ -11,6 +11,7 @@
 <?php endif; ?>
 
 <form method="post" action="<?= app()->route->getUrl('/employees/edit?id=' . $employee->employee_id) ?>">
+    <input type="hidden" name="csrf_token" value="<?= app()->auth::generateCSRF() ?>">
     <div class="form-grid">
         <div class="form-group">
             <label>Фамилия</label>
