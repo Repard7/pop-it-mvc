@@ -37,4 +37,27 @@ class DepartmentController
         $department->delete();
         app()->route->redirect('/departments');
     }
+
+    public function edit(Request $request): string
+    {
+        $department = Department::find($request->id);
+        
+        if (!$department) {
+            app()->route->redirect('/departments');
+            return '';
+        }
+        
+        // GET: показываем форму
+        if ($request->method === 'GET') {
+            return (new View('departments.edit', ['department' => $department]))->render();
+        }
+        
+        // POST: обновляем данные
+        $department->update([
+            'department_name' => $request->name
+        ]);
+        
+        app()->route->redirect('/departments');
+        return '';
+    }
 }

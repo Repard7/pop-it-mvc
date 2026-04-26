@@ -19,20 +19,20 @@ class DisciplineController
     {
         if ($request->method === 'GET') {
             $departments = Department::all();
-            return (new View('disciplines.add', ['departments' => $departments]))->render();
+            return (new View('disciplines.add', [
+                'departments' => $departments
+            ]))->render();
         }
         
-        // Создание дисциплины с новыми полями
+        // Создаем дисциплину со ВСЕМИ полями
         $discipline = Discipline::create([
             'discipline_name' => $request->name,
             'hours' => $request->hours,
             'semester' => $request->semester
         ]);
         
-        // Привязка к кафедре (если выбрана)
-        if ($request->department_id) {
-            $discipline->departments()->attach($request->department_id);
-        }
+        // Привязываем выбранные кафедры
+        $discipline->departments()->attach($request->department_ids ?? []);
         
         app()->route->redirect('/disciplines');
         return '';
@@ -44,5 +44,34 @@ class DisciplineController
         $discipline->departments()->detach();
         $discipline->delete();
         app()->route->redirect('/disciplines');
+    }
+
+    public function edit(Request $request): string
+    {
+        $discipline = Discipline::with('departments')->find($request->id);
+        
+        if (!$discipline) {
+            app()->route->redirect('/disciplines');
+            return '';
+        }
+        
+        if ($request->method === 'GET') {
+            $departments = Department::all();
+            return (new View('disciplines.edit', [
+                'discipline' => $discipline,
+                'departments' => $departments
+            ]))->render();
+        }
+        
+        // POST: обновляем название дисциплины
+        $discipline->update([
+            'discipline_name' => $request->name
+        ]);
+        
+        // Обновляем связи с кафедрами (sync сам удалит старые и добавит новые)
+        $discipline->departments()->sync($request->department_ids ?? []);
+        
+        app()->route->redirect('/disciplines');
+        return '';
     }
 }

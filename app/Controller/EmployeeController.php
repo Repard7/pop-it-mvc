@@ -72,4 +72,52 @@ class EmployeeController
         }
         app()->route->redirect('/employees');
     }
+
+    public function edit(Request $request): string
+    {
+        $employee = Employee::with('users.position', 'users.department')->find($request->id);
+        
+        if (!$employee) {
+            app()->route->redirect('/employees');
+            return '';
+        }
+        
+        $user = $employee->users->first();
+        
+        // GET: показываем форму
+        if ($request->method === 'GET') {
+            $departments = Department::all();
+            return (new View('employees.edit', [
+                'employee' => $employee,
+                'user' => $user,
+                'departments' => $departments
+            ]))->render();
+        }
+        
+        // POST: обновляем данные сотрудника
+        $employee->update([
+            'first_name' => $request->firstname,
+            'last_name' => $request->lastname,
+            'patronymic' => $request->middlename,
+            'gender' => $request->gender === 'male' ? 'М' : 'Ж',
+            'birth_date' => $request->birthdate,
+            'registration_address' => $request->address
+        ]);
+
+        // Обновляем данные пользователя
+        if ($user) {
+            $user->update([
+                'login' => $request->login,
+                'department_id' => $request->department_id ?: null
+            ]);
+
+            // Обновляем пароль только если он был указан
+            if (!empty($request->password)) {
+                $user->update(['password' => md5($request->password)]);
+            }
+        }
+        
+        app()->route->redirect('/employees');
+        return '';
+    }
 }

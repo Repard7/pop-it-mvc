@@ -1,12 +1,19 @@
 <h2>➕ Добавление дисциплины</h2>
 
 <form method="post">
-    <label>Название дисциплины <input type="text" name="name" required></label>
+    <label style="display: block; margin-bottom: 10px;">
+        Название дисциплины<br>
+        <input type="text" name="name" required style="width: 100%;">
+    </label>
 
-    <label>Количество часов <input type="number" name="hours" required></label>
+    <label style="display: block; margin-bottom: 10px;">
+        Количество часов<br>
+        <input type="number" name="hours" required style="width: 100%;">
+    </label>
 
-    <label>Семестр 
-        <select name="semester" required>
+    <label style="display: block; margin-bottom: 15px;">
+        Семестр<br>
+        <select name="semester" required style="width: 100%;">
             <option value="1">1 семестр</option>
             <option value="2">2 семестр</option>
             <option value="3">3 семестр</option>
@@ -18,15 +25,21 @@
         </select>
     </label>
 
-    <label>Кафедра
-        <select name="department_id">
-            <option value="">— Без кафедры —</option>
-            <?php foreach ($departments as $dep): ?>
-                <option value="<?= $dep->department_id ?>"><?= $dep->department_name ?></option>
-            <?php endforeach; ?>
-        </select>
-    </label>
+    <fieldset style="margin-bottom: 20px;">
+        <legend>Кафедры:</legend>
+        
+        <input type="hidden" name="department_ids" value="">
+        
+        <?php foreach ($departments as $dep): ?>
+            <label style="display: block; margin: 5px 0;">
+                <input type="checkbox" 
+                       name="department_ids[]" 
+                       value="<?= $dep->department_id ?>">
+                <?= htmlspecialchars($dep->department_name) ?>
+            </label>
+        <?php endforeach; ?>
+    </fieldset>
 
-    <button>Добавить</button>
+    <button type="submit">Добавить</button>
     <a href="<?= app()->route->getUrl('/disciplines') ?>">Отмена</a>
 </form>
