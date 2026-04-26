@@ -30,8 +30,9 @@ class EmployeeController
         
         // Валидация
         $validator = new Validator($request->all(), [
-            'lastname' => ['required'],
-            'firstname' => ['required'],
+            'lastname' => ['required', 'name_part'],
+            'firstname' => ['required', 'name_part'],
+            'middlename' => ['name_part'],
             'gender' => ['required'],
             'birthdate' => ['required'],
             'address' => ['required'],
@@ -39,6 +40,7 @@ class EmployeeController
             'password' => ['required']
         ], [
             'required' => 'Поле :field обязательно для заполнения',
+            'name_part' => 'Поле :field должно содержать только буквы',
             'unique' => 'Поле :field должно быть уникальным'
         ]);
         
@@ -97,7 +99,7 @@ class EmployeeController
             ]))->render();
         }
         
-        // Валидация для редактирования (логин уникальный, но исключая текущего)
+        // Валидация для редактирования
         $validator = new Validator($request->all(), [
             'lastname' => ['required', 'name_part'],
             'firstname' => ['required', 'name_part'],
@@ -105,11 +107,10 @@ class EmployeeController
             'gender' => ['required'],
             'birthdate' => ['required'],
             'address' => ['required'],
-            'login' => ['required', 'unique:User,login'] // unique проверку делаем отдельно
+            'login' => ['required']
         ], [
             'required' => 'Поле :field обязательно для заполнения',
-            'name_part' => 'Поле :field должно содержать только буквы',
-            'unique' => 'Поле :field должно быть уникальным'
+            'name_part' => 'Поле :field должно содержать только буквы'
         ]);
         
         // Проверка уникальности логина (исключая текущего пользователя)
