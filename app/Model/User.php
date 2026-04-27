@@ -10,7 +10,7 @@ class User extends Model implements IdentityInterface
 {
     use HasFactory;
 
-    protected $table = 'User';
+    protected $table = 'user';
     public $timestamps = false;
     protected $primaryKey = 'user_id';
     protected $fillable = [

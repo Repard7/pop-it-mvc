@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 class Discipline extends Model
 {
     public $timestamps = false;
-    protected $table = 'Discipline'; 
+    protected $table = 'discipline'; 
     protected $primaryKey = 'discipline_id';
     protected $fillable = ['discipline_name', 'hours', 'semester'];
     
@@ -14,7 +14,7 @@ class Discipline extends Model
     {
         return $this->belongsToMany(
             Department::class,
-            'Department_Discipline',
+            'department_discipline',
             'discipline_id',
             'department_id'
         );

@@ -10,16 +10,20 @@
     </div>
 <?php endif; ?>
 
-<form method="post">
+<form method="post" class="form">
     <input type="hidden" name="csrf_token" value="<?= app()->auth::generateCSRF() ?>">
-    <label>Название кафедры 
-        <input type="text" name="name" value="<?= htmlspecialchars($old['name'] ?? '') ?>" >
-    </label>
+    <div class="form-group">
+        <label>Название кафедры</label>
+        <input type="text" name="name" value="<?= htmlspecialchars($old['name'] ?? '') ?>">
+    </div>
     
-    <label>Код кафедры 
-        <input type="text" name="code" placeholder="Например: ПИ, ИС, КБ" value="<?= htmlspecialchars($old['code'] ?? '') ?>" >
-    </label>
+    <div class="form-group">
+        <label>Код кафедры</label>
+        <input type="text" name="code" placeholder="Например: ПИ, ИС, КБ" value="<?= htmlspecialchars($old['code'] ?? '') ?>">
+    </div>
 
-    <button>Добавить</button>
-    <a href="<?= app()->route->getUrl('/departments') ?>">Отмена</a>
+    <div class="form-actions">
+        <button type="submit" class="btn-primary">Добавить</button>
+        <a href="<?= app()->route->getUrl('/departments') ?>" class="btn-secondary">Отмена</a>
+    </div>
 </form>

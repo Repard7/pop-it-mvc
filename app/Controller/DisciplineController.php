@@ -9,6 +9,7 @@ use Src\Request;
 
 use Validation\Validator;
 use Validation\Validators\RequireValidator;
+use Validation\Validators\MinArrayValidator;
 
 class DisciplineController
 {
@@ -26,14 +27,30 @@ class DisciplineController
             return (new View('disciplines.add', ['departments' => $departments]))->render();
         }
         
-        $validator = new Validator($request->all(), [
+        $departmentIds = [];
+        if (isset($_POST['department_ids']) && is_array($_POST['department_ids'])) {
+            $departmentIds = $_POST['department_ids'];
+        }
+        
+        $departmentIds = array_filter($departmentIds, function($id) {
+            return !empty($id) && is_numeric($id);
+        });
+        $departmentIds = array_map('intval', $departmentIds);
+        
+        $data = $request->all();
+        $data['department_ids'] = $departmentIds;
+        
+        $validator = new Validator($data, [
             'name' => ['required'],
             'hours' => ['required'],
-            'semester' => ['required']
+            'semester' => ['required'],
+            'department_ids' => ['min_array:1']
         ], [
-            'required' => 'Поле :field обязательно для заполнения'
+            'required' => 'Поле :field обязательно для заполнения',
+            'min_array' => 'Выберите хотя бы одну кафедру'
         ], [
-            'required' => RequireValidator::class
+            'required' => RequireValidator::class,
+            'min_array' => MinArrayValidator::class
         ]);
         
         if ($validator->fails()) {
@@ -50,9 +67,7 @@ class DisciplineController
             'semester' => $request->semester
         ]);
         
-        if (!empty($request->department_ids) && is_array($request->department_ids)) {
-            $discipline->departments()->attach($request->department_ids);
-        }
+        $discipline->departments()->sync($departmentIds);
         
         app()->route->redirect('/disciplines');
         return '';
@@ -75,14 +90,30 @@ class DisciplineController
             ]))->render();
         }
         
-        $validator = new Validator($request->all(), [
+        $departmentIds = [];
+        if (isset($_POST['department_ids']) && is_array($_POST['department_ids'])) {
+            $departmentIds = $_POST['department_ids'];
+        }
+        
+        $departmentIds = array_filter($departmentIds, function($id) {
+            return !empty($id) && is_numeric($id);
+        });
+        $departmentIds = array_map('intval', $departmentIds);
+        
+        $data = $request->all();
+        $data['department_ids'] = $departmentIds;
+        
+        $validator = new Validator($data, [
             'name' => ['required'],
             'hours' => ['required'],
-            'semester' => ['required']
+            'semester' => ['required'],
+            'department_ids' => ['min_array:1']
         ], [
-            'required' => 'Поле :field обязательно для заполнения'
+            'required' => 'Поле :field обязательно для заполнения',
+            'min_array' => 'Выберите хотя бы одну кафедру'
         ], [
-            'required' => RequireValidator::class  // ← ЭТОЙ СТРОКИ НЕ ХВАТАЛО
+            'required' => RequireValidator::class,
+            'min_array' => MinArrayValidator::class
         ]);
         
         if ($validator->fails()) {
@@ -100,7 +131,7 @@ class DisciplineController
             'semester' => $request->semester
         ]);
         
-        $discipline->departments()->sync($request->department_ids ?? []);
+        $discipline->departments()->sync($departmentIds);
         
         app()->route->redirect('/disciplines');
         return '';

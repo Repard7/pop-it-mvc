@@ -38,12 +38,10 @@ class Site
 
     public function login(Request $request): string
     {
-        // Если просто обращение к странице, то отобразить форму
         if ($request->method === 'GET') {
             return new View('site.login');
         }
         
-        // Валидация полей входа
         $validator = new Validator($request->all(), [
             'login' => ['required'],
             'password' => ['required']
@@ -53,9 +51,7 @@ class Site
             'required' => RequireValidator::class
         ]);
         
-        // Если валидация не прошла
         if ($validator->fails()) {
-            // Преобразуем ошибки в читаемый формат
             $errorMessages = [];
             foreach ($validator->errors() as $field => $messages) {
                 $fieldName = ($field === 'login') ? 'Логин' : 'Пароль';
@@ -67,12 +63,10 @@ class Site
             ]);
         }
         
-        // Если удалось аутентифицировать пользователя, то редирект
         if (Auth::attempt($request->all())) {
             app()->route->redirect('/');
         }
         
-        // Если аутентификация не удалась, то сообщение об ошибке
         return new View('site.login', ['message' => 'Неправильные логин или пароль']);
     }
 

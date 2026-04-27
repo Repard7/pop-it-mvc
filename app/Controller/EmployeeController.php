@@ -32,7 +32,6 @@ class EmployeeController
         
         $currentUser = app()->auth::user();
         
-        // Валидация
         $validator = new Validator($request->all(), [
             'lastname' => ['required', 'name_part'],
             'firstname' => ['required', 'name_part'],

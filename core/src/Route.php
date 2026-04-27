@@ -12,20 +12,15 @@ use Src\Traits\SingletonTrait;
 
 class Route
 {
-   //Используем методы трейта
    use SingletonTrait;
 
-   //Свойство для хранения текущего маршрута
    private string $currentRoute = '';
    private $currentHttpMethod;
 
-   //Свойство для префикса для всех маршрутов
    private string $prefix = '';
 
-   //Классы для использования внешнего маршрутизатора
    private RouteCollector $routeCollector;
 
-   //Добавляет маршрут, устанавливает его текущим и возвращает объект
    public static function add($httpMethod, string $route, array $action): self
    {
        self::single()->routeCollector->addRoute($httpMethod, $route, $action);
@@ -34,14 +29,12 @@ class Route
        return self::single();
    }
 
-   //Добавляет префикс для обозначенных маршрутов
    public static function group(string $prefix, callable $callback): void
    {
        self::single()->routeCollector->addGroup($prefix, $callback);
        Middleware::single()->group($prefix, $callback);
    }
 
-   //Конструктор скрыт. Вызывается только один раз
    private function __construct()
    {
        $this->routeCollector = new RouteCollector(new Std(), new MarkBased());
@@ -63,7 +56,6 @@ class Route
        return $this->prefix . $url;
    }
 
-   //Добавление middlewares для текущего маршрута
    public function middleware(...$middlewares): self
    {
        Middleware::single()->add($this->currentHttpMethod, $this->currentRoute, $middlewares);
@@ -72,11 +64,9 @@ class Route
 
     public function start(): void
     {
-        // Fetch method and URI from somewhere
         $httpMethod = $_SERVER['REQUEST_METHOD'];
         $uri = $_SERVER['REQUEST_URI'];
 
-        // Strip query string (?foo=bar) and decode URI
         if (false !== $pos = strpos($uri, '?')) {
             $uri = substr($uri, 0, $pos);
         }
@@ -94,7 +84,6 @@ class Route
             case Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = array_values($routeInfo[2]);
-        //Вызываем обработку всех Middleware
                 $vars[] = Middleware::single()->go($httpMethod, $uri, new Request());
                 $class = $handler[0];
                 $action = $handler[1];

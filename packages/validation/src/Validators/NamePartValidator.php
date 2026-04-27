@@ -11,10 +11,9 @@ class NamePartValidator extends AbstractValidator
     public function rule(): bool
     {
         if (empty($this->value)) {
-            return true; // пустое поле проверит required
+            return true;
         }
         
-        // Только буквы (русские/английские) и дефис (для двойных фамилий типа "Салтыков-Щедрин")
         return (bool)preg_match('/^[a-zA-Zа-яА-ЯёЁ]+$/u', $this->value);
     }
 }

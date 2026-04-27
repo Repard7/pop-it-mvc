@@ -11,8 +11,6 @@ class UniqueValidator extends AbstractValidator
 
     public function rule(): bool
     {
-        // $this->args[0] - это 'Department'
-        // $this->args[1] - это 'code'
         $table = $this->args[0] ?? '';
         $field = $this->args[1] ?? '';
         

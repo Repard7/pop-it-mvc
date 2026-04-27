@@ -2,7 +2,6 @@
 
 namespace Src\Traits;
 
-//Позволяет для любого класса организовать паттерн Одиночка
 trait SingletonTrait
 {
    private static self $instance;

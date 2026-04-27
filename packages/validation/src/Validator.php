@@ -33,7 +33,6 @@ class Validator
             [$validatorName, $args] = count($tmp) > 1 ? $tmp : [$validatorName, null];
             $args = isset($args) ? explode(',', $args) : [];
 
-            // Проверяем, есть ли такой валидатор в переданном массиве
             if (!isset($this->validators[$validatorName])) {
                 continue;
             }

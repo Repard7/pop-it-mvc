@@ -10,7 +10,6 @@ class RequireValidator extends AbstractValidator
 
     public function rule(): bool
     {
-        // Проверяем, что значение не пустое и не null
         return !empty($this->value) || $this->value === '0';
     }
 }

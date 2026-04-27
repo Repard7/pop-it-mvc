@@ -18,7 +18,6 @@ class View
        $this->data = $data;
    }
 
-   //Полный путь до директории с представлениями
    private function getRoot(): string
    {
        global $app;
@@ -28,13 +27,11 @@ class View
        return $_SERVER['DOCUMENT_ROOT'] . $root . $path;
    }
 
-   //Путь до основного файла с шаблоном сайта
    private function getPathToMain(): string
    {
        return $this->root . $this->layout;
    }
 
-   //Путь до текущего шаблона
    private function getPathToView(string $view = ''): string
    {
        $view = str_replace('.', '/', $view);
@@ -49,16 +46,12 @@ class View
         $path = $this->getPathToView($view);
         if (file_exists($this->getPathToMain()) && file_exists($path)) {
 
-           //Импортирует переменные из массива в текущую таблицу символов
            extract($data, EXTR_PREFIX_SAME, '');
 
-           //Включение буферизации вывода
            ob_start();
            require $path;
-           //Помещаем буфер в переменную и очищаем его
            $content = ob_get_clean();
 
-           //Возвращаем собранную страницу
            return require($this->getPathToMain());
        }
        throw new Exception('Error render');

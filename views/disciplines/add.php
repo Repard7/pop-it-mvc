@@ -12,6 +12,7 @@
 
 <form method="post">
     <input type="hidden" name="csrf_token" value="<?= app()->auth::generateCSRF() ?>">
+    
     <div class="form-group">
         <label>Название дисциплины</label>
         <input type="text" name="name" value="<?= htmlspecialchars($old['name'] ?? '') ?>">
@@ -24,7 +25,7 @@
 
     <div class="form-group">
         <label>Семестр</label>
-        <select name="semester" required>
+        <select name="semester">
             <option value="1" <?= ($old['semester'] ?? '') == 1 ? 'selected' : '' ?>>1 семестр</option>
             <option value="2" <?= ($old['semester'] ?? '') == 2 ? 'selected' : '' ?>>2 семестр</option>
             <option value="3" <?= ($old['semester'] ?? '') == 3 ? 'selected' : '' ?>>3 семестр</option>
@@ -37,8 +38,7 @@
     </div>
 
     <fieldset>
-        <legend>Кафедры</legend>
-        <input type="hidden" name="department_ids" value="">
+        <legend>Кафедры (выберите хотя бы одну)</legend>
         <?php foreach ($departments as $dep): ?>
             <label style="display: block; margin: 5px 0;">
                 <input type="checkbox" 
