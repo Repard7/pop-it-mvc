@@ -9,7 +9,7 @@ class DepartmentTest extends TestCase
 {
     protected function setUp(): void
     {
-        $_SERVER['DOCUMENT_ROOT'] = realpath(__DIR__ . '/../..');
+        $_SERVER['DOCUMENT_ROOT'] = 'C:/xampp/htdocs';
         
         $GLOBALS['app'] = new Src\Application(new Src\Settings([
             'app' => include $_SERVER['DOCUMENT_ROOT'] . '/pop-it-mvc/config/app.php',
@@ -32,24 +32,22 @@ class DepartmentTest extends TestCase
         $request = new Request();
         
         ob_start();
-        try {
-            (new DepartmentController())->add($request);
-        } catch (Exception $e) {
-        }
+        (new DepartmentController())->add($request);
         $result = ob_get_clean();
         
-        $this->assertIsString($result);
         $this->assertStringContainsString('Добавление кафедры', $result);
         $this->assertStringContainsString('обязательно', $result);
     }
 
     public function testAddDepartmentWithValidData()
     {
-        $uniqueCode = 'TEST_' . time();
+        $code = 'TEST_CODE';
+        
+        Department::where('code', $code)->delete();
         
         $_POST = [
             'name' => 'Тестовая кафедра',
-            'code' => $uniqueCode
+            'code' => $code
         ];
         $_REQUEST = $_POST;
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -57,19 +55,14 @@ class DepartmentTest extends TestCase
         $request = new Request();
         
         ob_start();
-        try {
-            (new DepartmentController())->add($request);
-        } catch (Exception $e) {
-        }
+        (new DepartmentController())->add($request);
         ob_get_clean();
         
-        $department = Department::where('code', $uniqueCode)->first();
+        $department = Department::where('code', $code)->first();
         
-        $this->assertNotNull($department, "Кафедра с кодом '$uniqueCode' не создалась");
+        $this->assertNotNull($department, "Кафедра с кодом '$code' не создалась");
         $this->assertEquals('Тестовая кафедра', $department->department_name);
         
-        if ($department) {
-            $department->delete();
-        }
+        $department->delete();
     }
 }
