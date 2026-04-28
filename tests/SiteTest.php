@@ -9,7 +9,7 @@ class SiteTest extends TestCase
 {
     protected function setUp(): void
     {
-        $_SERVER['DOCUMENT_ROOT'] = 'C:/xampp/htdocs';
+        $_SERVER['DOCUMENT_ROOT'] = realpath(__DIR__ . '/../..');
         
         $GLOBALS['app'] = new Src\Application(new Src\Settings([
             'app' => include $_SERVER['DOCUMENT_ROOT'] . '/pop-it-mvc/config/app.php',
