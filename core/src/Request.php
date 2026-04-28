@@ -13,8 +13,13 @@ class Request
    public function __construct()
    {
        $this->body = $_REQUEST;
-       $this->method = $_SERVER['REQUEST_METHOD'];
-       $this->headers = getallheaders() ?? [];
+       $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+       
+       if (function_exists('getallheaders')) {
+           $this->headers = getallheaders() ?? [];
+       } else {
+           $this->headers = [];
+       }
    }
 
    public function all(): array
@@ -29,7 +34,7 @@ class Request
 
    public function get($field)
    {
-       return $this->body[$field];
+       return $this->body[$field] ?? null;
    }
 
    public function files(): array

@@ -1,6 +1,6 @@
 <?php
 return [
-   'root' => '',
+   'root' => 'pop-it-mvc',
    'routes' => 'routes',
    'views' => 'views'
 ];

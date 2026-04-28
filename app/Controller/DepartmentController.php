@@ -71,10 +71,9 @@ class DepartmentController
         ], [
             'required' => 'Поле :field обязательно для заполнения'
         ], [
-            'required' => RequireValidator::class  // ← ЭТОЙ СТРОКИ НЕ ХВАТАЛО
+            'required' => RequireValidator::class
         ]);
         
-        // Проверка уникальности кода (исключая текущую кафедру)
         $existingDept = Department::where('code', $request->code)
             ->where('department_id', '!=', $department->department_id)
             ->first();
