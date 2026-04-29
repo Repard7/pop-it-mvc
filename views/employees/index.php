@@ -27,15 +27,25 @@
                         <td><strong><?= htmlspecialchars($emp->last_name) ?></strong> <?= htmlspecialchars($emp->first_name) ?> <?= htmlspecialchars($emp->patronymic) ?></td>
                         <td><?= htmlspecialchars($user->login ?? '-') ?></td>
                         <td>
-                            <?php if ($user->position->position_name === 'Администратор'): ?>
-                                <span class="badge-admin">Администратор</span>
-                            <?php elseif ($user->position->position_name === 'Сотрудник деканата'): ?>
-                                <span class="badge-deanery">Сотрудник деканата</span>
+                            <?php if ($user && $user->position): ?>
+                                <?php if ($user->position->position_name === 'Администратор'): ?>
+                                    <span class="badge-admin">Администратор</span>
+                                <?php elseif ($user->position->position_name === 'Сотрудник деканата'): ?>
+                                    <span class="badge-deanery">Сотрудник деканата</span>
+                                <?php else: ?>
+                                    <span class="badge-teaching">Педагогический сотрудник</span>
+                                <?php endif; ?>
                             <?php else: ?>
-                                <span class="badge-teaching">Педагогический сотрудник</span>
+                                <span class="text-muted">—</span>
                             <?php endif; ?>
                         </td>
-                        <td><?= htmlspecialchars($user->department->department_name ?? '-') ?></td>
+                        <td>
+                            <?php if ($user && $user->department): ?>
+                                <?= htmlspecialchars($user->department->department_name) ?>
+                            <?php else: ?>
+                                <span class="text-muted">—</span>
+                            <?php endif; ?>
+                        </td>
                         <?php if (app()->auth::user()->isDeaneryStaff()): ?>
                             <td class="actions">
                                 <a href="<?= app()->route->getUrl('/employees/edit?id=' . $emp->employee_id) ?>" class="action-link">Редактировать</a>

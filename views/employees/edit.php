@@ -50,11 +50,6 @@
             <label>Логин</label>
             <input type="text" name="login" value="<?= htmlspecialchars($old['login'] ?? $user->login ?? '') ?>">
         </div>
-        
-        <div class="form-group">
-            <label>Новый пароль <small>(оставьте пустым, чтобы не менять)</small></label>
-            <input type="password" name="password">
-        </div>
 
         <div class="form-group">
             <label>Кафедра</label>

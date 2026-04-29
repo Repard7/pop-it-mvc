@@ -31,14 +31,6 @@ class User extends Model implements IdentityInterface
     {
         return $this->belongsTo(Department::class, 'department_id', 'department_id');
     }
-    
-   protected static function booted()
-   {
-       static::created(function ($user) {
-           $user->password = md5($user->password);
-           $user->save();
-       });
-   }
 
     public function findIdentity(int $id)
     {

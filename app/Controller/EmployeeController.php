@@ -11,7 +11,7 @@ use Src\Request;
 
 use Validation\Validator;
 use Validation\Validators\RequireValidator;
-use Validation\Validators\UniqueValidator;
+use Validators\UniqueValidator;
 use Validation\Validators\NamePartValidator;
 
 class EmployeeController
@@ -76,7 +76,7 @@ class EmployeeController
         
         User::create([
             'login' => $request->login,
-            'password' => password_hash($request->password, PASSWORD_DEFAULT),
+            'password' => md5($request->password),
             'employee_id' => $employee->employee_id,
             'position_id' => $position->position_id,
             'department_id' => $request->department_id ?: null
@@ -146,6 +146,7 @@ class EmployeeController
             ]))->render();
         }
         
+        // Обновляем данные сотрудника
         $employee->update([
             'first_name' => $request->firstname,
             'last_name' => $request->lastname,
@@ -155,21 +156,19 @@ class EmployeeController
             'registration_address' => $request->address
         ]);
         
+        // Обновляем пользователя (логин и кафедру, НО НЕ ПАРОЛЬ)
         if ($user) {
             $user->update([
                 'login' => $request->login,
                 'department_id' => $request->department_id ?: null
             ]);
-            
-            if (!empty($request->password)) {
-                $user->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
-            }
+            // БЛОК С ПАРОЛЕМ УДАЛЁН
         }
         
         app()->route->redirect('/employees');
         return '';
     }
-
+    
     public function delete(Request $request): void
     {
         $employee = Employee::find($request->id);
