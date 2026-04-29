@@ -38,16 +38,22 @@ class Validator
             }
 
             $validatorClass = $this->validators[$validatorName];
-            
             if (!class_exists($validatorClass)) {
                 continue;
+            }
+
+            $message = null;
+            if (isset($this->messages[$fieldName . '.' . $validatorName])) {
+                $message = $this->messages[$fieldName . '.' . $validatorName];
+            } elseif (isset($this->messages[$validatorName])) {
+                $message = $this->messages[$validatorName];
             }
 
             $validator = new $validatorClass(
                 $fieldName,
                 $this->fields[$fieldName] ?? null,
                 $args,
-                $this->messages[$validatorName] ?? null
+                $message
             );
 
             if (!$validator->rule()) {

@@ -32,30 +32,53 @@ class EmployeeController
         
         $currentUser = app()->auth::user();
         
-        $validator = new Validator($request->all(), [
+        $rules = [
             'lastname' => ['required', 'name_part'],
             'firstname' => ['required', 'name_part'],
-            'middlename' => ['name_part'],
+            'middlename'=> ['name_part'],
             'gender' => ['required'],
             'birthdate' => ['required'],
             'address' => ['required'],
             'login' => ['required', 'unique:User,login'],
             'password' => ['required']
-        ], [
-            'required' => 'Поле :field обязательно для заполнения',
-            'name_part' => 'Поле :field должно содержать только буквы',
-            'unique' => 'Поле :field должно быть уникальным'
-        ], [
+        ];
+
+        $messages = [
+            'lastname.required' => 'Фамилия обязательна',
+            'lastname.name_part' => 'Фамилия должна содержать только буквы',
+            'firstname.required' => 'Имя обязательно',
+            'firstname.name_part' => 'Имя должно содержать только буквы',
+            'middlename.name_part' => 'Отчество должно содержать только буквы',
+            'gender.required' => 'Пол обязателен',
+            'birthdate.required' => 'Дата рождения обязательна',
+            'address.required' => 'Адрес обязателен',
+            'login.required' => 'Логин обязателен',
+            'login.unique' => 'Логин уже используется',
+            'password.required' => 'Пароль обязателен',
+        ];
+
+        $validator = new Validator($request->all(), $rules, $messages, [
             'required' => RequireValidator::class,
             'unique' => UniqueValidator::class,
             'name_part' => NamePartValidator::class
         ]);
         
         if ($validator->fails()) {
+            $fieldNames = [
+                'lastname' => 'Фамилия',
+                'firstname' => 'Имя',
+                'middlename' => 'Отчество',
+                'gender' => 'Пол',
+                'birthdate' => 'Дата рождения',
+                'address' => 'Адрес',
+                'login' => 'Логин',
+                'password' => 'Пароль'
+            ];
             return (new View('employees.add', [
                 'departments' => $departments,
                 'errors' => $validator->errors(),
-                'old' => $request->all()
+                'old' => $request->all(),
+                'fieldNames' => $fieldNames,
             ]))->render();
         }
         
@@ -106,19 +129,31 @@ class EmployeeController
             ]))->render();
         }
         
-        $validator = new Validator($request->all(), [
+        $rules = [
             'lastname' => ['required', 'name_part'],
             'firstname' => ['required', 'name_part'],
-            'middlename' => ['name_part'],
+            'middlename'=> ['name_part'],
             'gender' => ['required'],
             'birthdate' => ['required'],
             'address' => ['required'],
             'login' => ['required']
-        ], [
-            'required' => 'Поле :field обязательно для заполнения',
-            'name_part' => 'Поле :field должно содержать только буквы'
-        ], [
+        ];
+
+        $messages = [
+            'lastname.required' => 'Фамилия обязательна',
+            'lastname.name_part' => 'Фамилия должна содержать только буквы',
+            'firstname.required' => 'Имя обязательно',
+            'firstname.name_part' => 'Имя должно содержать только буквы',
+            'middlename.name_part' => 'Отчество должно содержать только буквы',
+            'gender.required' => 'Пол обязателен',
+            'birthdate.required' => 'Дата рождения обязательна',
+            'address.required' => 'Адрес обязателен',
+            'login.required' => 'Логин обязателен',
+        ];
+
+        $validator = new Validator($request->all(), $rules, $messages, [
             'required' => RequireValidator::class,
+            'unique' => UniqueValidator::class,
             'name_part' => NamePartValidator::class
         ]);
 
@@ -137,12 +172,23 @@ class EmployeeController
         }
         
         if ($validator->fails()) {
+            $fieldNames = [
+                'lastname' => 'Фамилия',
+                'firstname' => 'Имя',
+                'middlename' => 'Отчество',
+                'gender' => 'Пол',
+                'birthdate' => 'Дата рождения',
+                'address' => 'Адрес',
+                'login' => 'Логин',
+                'password' => 'Пароль'
+            ];
             return (new View('employees.edit', [
                 'employee' => $employee,
                 'user' => $user,
                 'departments' => $departments,
                 'errors' => $validator->errors(),
-                'old' => $request->all()
+                'old' => $request->all(),
+                'fieldNames' => $fieldNames,
             ]))->render();
         }
         
@@ -168,7 +214,7 @@ class EmployeeController
         app()->route->redirect('/employees');
         return '';
     }
-    
+
     public function delete(Request $request): void
     {
         $employee = Employee::find($request->id);

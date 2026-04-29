@@ -6,7 +6,7 @@ use Validation\AbstractValidator;
 
 class NamePartValidator extends AbstractValidator
 {
-    protected string $message = 'Поле :field должно содержать только буквы и дефис';
+    protected string $message = 'Поле :field должно содержать только буквы';
 
     public function rule(): bool
     {

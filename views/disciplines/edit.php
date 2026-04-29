@@ -1,40 +1,29 @@
 <h2>Редактирование дисциплины</h2>
 
-<?php if (!empty($errors)): ?>
-    <div style="background: rgba(234, 67, 53, 0.1); color: #EA4335; padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 3px solid #EA4335;">
-        <?php foreach ($errors as $field => $fieldErrors): ?>
-            <?php foreach ($fieldErrors as $error): ?>
-                <p style="margin: 5px 0;"><?= htmlspecialchars($error) ?></p>
-            <?php endforeach; ?>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
-
 <form method="post" action="<?= app()->route->getUrl('/disciplines/edit?id=' . $discipline->discipline_id) ?>">
     <input type="hidden" name="csrf_token" value="<?= app()->auth::generateCSRF() ?>">
+
     <div class="form-group">
         <label>Название дисциплины</label>
         <input type="text" name="name" value="<?= htmlspecialchars($old['name'] ?? $discipline->discipline_name) ?>">
+        <?php $field = 'name'; require __DIR__ . '/../parts/error.php'; ?>
     </div>
 
     <div class="form-group">
         <label>Количество часов</label>
         <input type="number" name="hours" value="<?= htmlspecialchars($old['hours'] ?? $discipline->hours) ?>">
+        <?php $field = 'hours'; require __DIR__ . '/../parts/error.php'; ?>
     </div>
 
     <div class="form-group">
         <label>Семестр</label>
         <select name="semester">
             <?php $selectedSemester = $old['semester'] ?? $discipline->semester; ?>
-            <option value="1" <?= $selectedSemester == 1 ? 'selected' : '' ?>>1 семестр</option>
-            <option value="2" <?= $selectedSemester == 2 ? 'selected' : '' ?>>2 семестр</option>
-            <option value="3" <?= $selectedSemester == 3 ? 'selected' : '' ?>>3 семестр</option>
-            <option value="4" <?= $selectedSemester == 4 ? 'selected' : '' ?>>4 семестр</option>
-            <option value="5" <?= $selectedSemester == 5 ? 'selected' : '' ?>>5 семестр</option>
-            <option value="6" <?= $selectedSemester == 6 ? 'selected' : '' ?>>6 семестр</option>
-            <option value="7" <?= $selectedSemester == 7 ? 'selected' : '' ?>>7 семестр</option>
-            <option value="8" <?= $selectedSemester == 8 ? 'selected' : '' ?>>8 семестр</option>
+            <?php for ($i = 1; $i <= 8; $i++): ?>
+                <option value="<?= $i ?>" <?= $selectedSemester == $i ? 'selected' : '' ?>><?= $i ?> семестр</option>
+            <?php endfor; ?>
         </select>
+        <?php $field = 'semester'; require __DIR__ . '/../parts/error.php'; ?>
     </div>
 
     <fieldset>
@@ -47,13 +36,12 @@
         foreach ($departments as $dep): 
         ?>
             <label style="display: block; margin: 5px 0;">
-                <input type="checkbox" 
-                       name="department_ids[]" 
-                       value="<?= $dep->department_id ?>"
-                       <?= in_array($dep->department_id, $selectedIds) ? 'checked' : '' ?>>
+                <input type="checkbox" name="department_ids[]" value="<?= $dep->department_id ?>"
+                    <?= in_array($dep->department_id, $selectedIds) ? 'checked' : '' ?>>
                 <?= htmlspecialchars($dep->department_name) ?>
             </label>
         <?php endforeach; ?>
+        <?php $field = 'department_ids'; require __DIR__ . '/../parts/error.php'; ?>
     </fieldset>
 
     <div class="form-actions">

@@ -39,35 +39,34 @@ class Site
     public function login(Request $request): string
     {
         if ($request->method === 'GET') {
-            return new View('site.login');
+            return (new View('site.login'))->render();
         }
-        
+
         $validator = new Validator($request->all(), [
-            'login' => ['required'],
+            'login'    => ['required'],
             'password' => ['required']
         ], [
-            'required' => 'Поле :field обязательно для заполнения'
+            'login.required'    => 'Логин обязателен',
+            'password.required' => 'Пароль обязателен'
         ], [
             'required' => RequireValidator::class
         ]);
-        
+
         if ($validator->fails()) {
-            $errorMessages = [];
-            foreach ($validator->errors() as $field => $messages) {
-                $fieldName = ($field === 'login') ? 'Логин' : 'Пароль';
-                $errorMessages[] = $fieldName . ': ' . implode(', ', $messages);
-            }
-            
-            return new View('site.login', [
-                'message' => implode('<br>', $errorMessages)
-            ]);
+            return (new View('site.login', [
+                'errors' => $validator->errors(),
+                'old'    => $request->all()
+            ]))->render();
         }
-        
+
         if (Auth::attempt($request->all())) {
             app()->route->redirect('/');
         }
-        
-        return new View('site.login', ['message' => 'Неправильные логин или пароль']);
+
+        return (new View('site.login', [
+            'message' => 'Неправильные логин или пароль',
+            'old'     => $request->all()
+        ]))->render();
     }
 
     public function logout(): void
@@ -78,7 +77,7 @@ class Site
 
     public function index(): string
     {
-        return new View('site.index');
+        return (new View('site.index'))->render();
     }
 
 

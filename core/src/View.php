@@ -13,7 +13,7 @@ class View
 
    public function __construct(string $view = '', array $data = [])
    {
-       $this->root = $this->getRoot();
+       $this->root = $this->getRoot(); //'/srv/users/tuckdvhi/evycmzk-m5/views'
        $this->view = $view;
        $this->data = $data;
    }
@@ -35,24 +35,22 @@ class View
    private function getPathToView(string $view = ''): string
    {
        $view = str_replace('.', '/', $view);
-       return $this->getRoot() . "/$view.php";
+       return $this->root . "/$view.php";
    }
 
    public function render(string $view = '', array $data = []): string
    {
         $view = $view ?: $this->view;
         $data = $data ?: $this->data;
-     
+
         $path = $this->getPathToView($view);
         if (file_exists($this->getPathToMain()) && file_exists($path)) {
-
-           extract($data, EXTR_PREFIX_SAME, '');
-
-           ob_start();
-           require $path;
-           $content = ob_get_clean();
-
-           return require($this->getPathToMain());
+            extract($data, EXTR_PREFIX_SAME, '');
+            ob_start();
+            require $path;
+            $content = ob_get_clean();
+            require $this->getPathToMain();
+            return '';
        }
        throw new Exception('Error render');
    }

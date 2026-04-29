@@ -40,24 +40,36 @@ class DisciplineController
         $data = $request->all();
         $data['department_ids'] = $departmentIds;
         
-        $validator = new Validator($data, [
+        $rules = [
             'name' => ['required'],
             'hours' => ['required'],
             'semester' => ['required'],
             'department_ids' => ['min_array:1']
-        ], [
-            'required' => 'Поле :field обязательно для заполнения',
-            'min_array' => 'Выберите хотя бы одну кафедру'
-        ], [
-            'required' => RequireValidator::class,
+        ];
+
+        $messages = [
+            'name.required' => 'Название дисциплины обязательно',
+            'hours.required' => 'Количество часов обязательно',
+            'semester.required' => 'Семестр обязателен',
+            'department_ids.min_array' => 'Выберите хотя бы одну кафедру',
+        ];
+
+        $validator = new Validator($data, $rules, $messages, [
+            'required'  => RequireValidator::class,
             'min_array' => MinArrayValidator::class
         ]);
         
         if ($validator->fails()) {
+            $fieldNames = [
+                'name' => 'Название дисциплины',
+                'hours' => 'Учебные часы',
+                'semester' => 'Семестр',
+            ];
             return (new View('disciplines.add', [
                 'departments' => $departments,
                 'errors' => $validator->errors(),
-                'old' => $request->all()
+                'old' => $request->all(),
+                'fieldNames' => $fieldNames,
             ]))->render();
         }
         
@@ -103,25 +115,37 @@ class DisciplineController
         $data = $request->all();
         $data['department_ids'] = $departmentIds;
         
-        $validator = new Validator($data, [
+        $rules = [
             'name' => ['required'],
             'hours' => ['required'],
             'semester' => ['required'],
             'department_ids' => ['min_array:1']
-        ], [
-            'required' => 'Поле :field обязательно для заполнения',
-            'min_array' => 'Выберите хотя бы одну кафедру'
-        ], [
-            'required' => RequireValidator::class,
+        ];
+
+        $messages = [
+            'name.required' => 'Название дисциплины обязательно',
+            'hours.required' => 'Количество часов обязательно',
+            'semester.required' => 'Семестр обязателен',
+            'department_ids.min_array' => 'Выберите хотя бы одну кафедру',
+        ];
+
+        $validator = new Validator($data, $rules, $messages, [
+            'required'  => RequireValidator::class,
             'min_array' => MinArrayValidator::class
         ]);
         
         if ($validator->fails()) {
+            $fieldNames = [
+                'name' => 'Название дисциплины',
+                'hours' => 'Учебные часы',
+                'semester' => 'Семестр',
+            ];
             return (new View('disciplines.edit', [
                 'discipline' => $discipline,
                 'departments' => $departments,
                 'errors' => $validator->errors(),
-                'old' => $request->all()
+                'old' => $request->all(),
+                'fieldNames' => $fieldNames
             ]))->render();
         }
         

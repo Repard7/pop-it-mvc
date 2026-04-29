@@ -3,6 +3,7 @@
 namespace Controller;
 
 use Model\Department;
+use Model\User;
 use Src\View;
 use Src\Request;
 
@@ -25,21 +26,31 @@ class DepartmentController
             return (new View('departments.add'))->render();
         }
         
-        $validator = new Validator($request->all(), [
+        $rules = [
             'name' => ['required'],
             'code' => ['required', 'unique:Department,code']
-        ], [
-            'required' => 'Поле :field обязательно для заполнения',
-            'unique' => 'Кафедра с таким кодом уже существует'
-        ], [
+        ];
+
+        $messages = [
+            'name.required' => 'Название кафедры обязательно для заполнения',
+            'code.required' => 'Код кафедры обязательно для заполнения',
+            'code.unique'   => 'Кафедра с таким кодом уже существует',
+        ];
+
+        $validator = new Validator($request->all(), $rules, $messages, [
             'required' => RequireValidator::class,
-            'unique' => UniqueValidator::class
+            'unique'   => UniqueValidator::class
         ]);
         
         if ($validator->fails()) {
+            $fieldNames = [
+                'name' => 'Название кафедры',
+                'code' => 'Код кафедры',
+            ];
             return (new View('departments.add', [
                 'errors' => $validator->errors(),
-                'old' => $request->all()
+                'old' => $request->all(),
+                'fieldNames' => $fieldnames,
             ]))->render();
         }
         
@@ -65,13 +76,20 @@ class DepartmentController
             return (new View('departments.edit', ['department' => $department]))->render();
         }
         
-        $validator = new Validator($request->all(), [
+        $rules = [
             'name' => ['required'],
-            'code' => ['required']
-        ], [
-            'required' => 'Поле :field обязательно для заполнения'
-        ], [
-            'required' => RequireValidator::class
+            'code' => ['required', 'unique:Department,code']
+        ];
+
+        $messages = [
+            'name.required' => 'Название кафедры обязательно для заполнения',
+            'code.required' => 'Код кафедры обязательно для заполнения',
+            'code.unique'   => 'Кафедра с таким кодом уже существует',
+        ];
+
+        $validator = new Validator($request->all(), $rules, $messages, [
+            'required' => RequireValidator::class,
+            'unique'   => UniqueValidator::class
         ]);
         
         $existingDept = Department::where('code', $request->code)
@@ -87,10 +105,15 @@ class DepartmentController
         }
         
         if ($validator->fails()) {
+            $fieldNames = [
+                'name' => 'Название кафедры',
+                'code' => 'Код кафедры',
+            ];
             return (new View('departments.edit', [
                 'department' => $department,
                 'errors' => $validator->errors(),
-                'old' => $request->all()
+                'old' => $request->all(),
+                'fieldNames' => $fieldNames,
             ]))->render();
         }
         
@@ -108,6 +131,7 @@ class DepartmentController
         $department = Department::find($request->id);
         if ($department) {
             $department->disciplines()->detach();
+            User::where('department_id', $department->department_id)->update(['department_id' => null]);
             $department->delete();
         }
         app()->route->redirect('/departments');
