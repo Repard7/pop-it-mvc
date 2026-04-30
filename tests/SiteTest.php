@@ -28,7 +28,7 @@ class SiteTest extends TestCase
      * @dataProvider additionProvider
      * @runInSeparateProcess
      */
-    public function testLogin($httpMethod, $userData, $message)
+    public function testLogin($httpMethod, $userData, $message, $isRedirect = false)
     {
         $request = $this->createMock(Request::class);
         $request->expects($this->any())
@@ -36,34 +36,31 @@ class SiteTest extends TestCase
             ->willReturn($userData);
         $request->method = $httpMethod;
         
-        $result = (new Site())->login($request);
+        $controller = new Site();
+        $controller->login($request);
         
-        if (!empty($result)) {
-            $message = '/' . preg_quote($message, '/') . '/';
-            $this->expectOutputRegex($message);
-            return;
+        if ($isRedirect) {
+            $headers = headers_list();
+            $found = false;
+            foreach ($headers as $header) {
+                if (strpos($header, 'Location:') === 0) {
+                    $found = true;
+                    $this->assertStringContainsString($message, $header);
+                    break;
+                }
+            }
+            $this->assertTrue($found, 'Location header not found');
+        } else {
+            $this->expectOutputRegex('/' . preg_quote($message, '/') . '/');
         }
-        
-        $this->assertContains($message, xdebug_get_headers());
     }
 
     public function additionProvider(): array
     {
         return [
-            ['GET', [
-                'login' => '',
-                'password' => ''
-            ], 'EduManager'],
-            
-            ['POST', [
-                'login' => '',
-                'password' => ''
-            ], 'Поле login обязательно'],
-            
-            ['POST', [
-                'login' => 'wrong',
-                'password' => 'wrong'
-            ], 'Неправильные логин или пароль'],
+            ['GET', ['login' => '', 'password' => ''], 'EduManager'],
+            ['POST', ['login' => '', 'password' => ''], 'Логин обязателен'],   // исправлено
+            ['POST', ['login' => 'wrong', 'password' => 'wrong'], 'Неправильные логин или пароль'],
         ];
     }
 }

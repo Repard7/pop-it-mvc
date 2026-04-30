@@ -51,7 +51,7 @@ class Validator
 
             $validator = new $validatorClass(
                 $fieldName,
-                $this->fields[$fieldName] ?? null,
+                $this->fields[$fieldName],
                 $args,
                 $message
             );
