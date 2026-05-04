@@ -9,14 +9,16 @@ class SiteTest extends TestCase
 {
     protected function setUp(): void
     {
-        $_SERVER['DOCUMENT_ROOT'] = realpath(__DIR__ . '/../..');
-        
+        $projectRoot = realpath(__DIR__ . '/..');
+
+        $_SERVER['DOCUMENT_ROOT'] = $projectRoot;
+
         $GLOBALS['app'] = new Src\Application(new Src\Settings([
-            'app' => include $_SERVER['DOCUMENT_ROOT'] . '/pop-it-mvc/config/app.php',
-            'db' => include $_SERVER['DOCUMENT_ROOT'] . '/pop-it-mvc/config/db.php',
-            'path' => include $_SERVER['DOCUMENT_ROOT'] . '/pop-it-mvc/config/path.php',
+            'app'  => include $projectRoot . '/config/app.php',
+            'db'   => include $projectRoot . '/config/db.php',
+            'path' => include $projectRoot . '/config/path.php',
         ]));
-        
+
         if (!function_exists('app')) {
             function app() {
                 return $GLOBALS['app'];
@@ -24,43 +26,48 @@ class SiteTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider additionProvider
-     * @runInSeparateProcess
-     */
-    public function testLogin($httpMethod, $userData, $message, $isRedirect = false)
+    public function testLoginGet()
     {
-        $request = $this->createMock(Request::class);
-        $request->expects($this->any())
-            ->method('all')
-            ->willReturn($userData);
-        $request->method = $httpMethod;
-        
-        $controller = new Site();
-        $controller->login($request);
-        
-        if ($isRedirect) {
-            $headers = headers_list();
-            $found = false;
-            foreach ($headers as $header) {
-                if (strpos($header, 'Location:') === 0) {
-                    $found = true;
-                    $this->assertStringContainsString($message, $header);
-                    break;
-                }
-            }
-            $this->assertTrue($found, 'Location header not found');
-        } else {
-            $this->expectOutputRegex('/' . preg_quote($message, '/') . '/');
-        }
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_POST = [];
+        $_REQUEST = [];
+
+        $request = new Request();
+        ob_start();
+        (new Site())->login($request);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('EduManager', $result);
+        $this->assertStringContainsString('Вход в систему управления', $result);
     }
 
-    public function additionProvider(): array
+    public function testLoginPostEmpty()
     {
-        return [
-            ['GET', ['login' => '', 'password' => ''], 'EduManager'],
-            ['POST', ['login' => '', 'password' => ''], 'Логин обязателен'],   // исправлено
-            ['POST', ['login' => 'wrong', 'password' => 'wrong'], 'Неправильные логин или пароль'],
-        ];
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = ['login' => '', 'password' => ''];
+        $_REQUEST = $_POST;
+
+        $request = new Request();
+        ob_start();
+        (new Site())->login($request);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Логин обязателен', $result);
+        $this->assertStringContainsString('Пароль обязателен', $result);
     }
+
+    public function testLoginPostWrongCredentials()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = ['login' => 'wrong', 'password' => 'wrong'];
+        $_REQUEST = $_POST;
+
+        $request = new Request();
+        ob_start();
+        (new Site())->login($request);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Неправильные логин или пароль', $result);
+    }
+
 }
